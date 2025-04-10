@@ -1,0 +1,332 @@
+
+----Order history and tracking---
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Costume Orders</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff8f0;
+      padding: 40px;
+      max-width: 900px;
+      margin: auto;
+      color: #000;
+    }
+
+    h2, h3 {
+      text-align: center;
+      color: #6a1b9a;
+      margin-bottom: 25px;
+    }
+
+    .input-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    input[type="text"], input[type="number"], select {
+      padding: 10px;
+      width: 60%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #6a1b9a;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .button-row button {
+      background-color: #ab47bc;
+      border-radius: 8px;
+    }
+
+    .order-details {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .order-details img {
+      max-width: 300px;
+      margin-top: 15px;
+      border-radius: 8px;
+    }
+
+    .progress-bar {
+      height: 20px;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress {
+      height: 100%;
+      text-align: center;
+      line-height: 20px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .processing { background-color: #fbc02d; width: 30%; }
+    .shipped { background-color: #29b6f6; width: 60%; }
+    .delivered { background-color: #43a047; width: 100%; }
+
+    body.dark-mode {
+      background-color: #1e1e2f;
+      color: #f0f0f0;
+    }
+
+    body.dark-mode input,
+    body.dark-mode select {
+      background-color: #2a2a40;
+      color: #f0f0f0;
+      border: 1px solid #555;
+    }
+
+    body.dark-mode .order-details {
+      background-color: #2a2a40;
+    }
+
+    body.dark-mode .progress-bar {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎭 Track Your Costume Order</h2>
+
+  <div class="input-section">
+    <input type="text" id="orderIdInput" placeholder="Enter Order ID (e.g., ORD001)">
+    <button onclick="trackOrder()">Track</button>
+  </div>
+
+  <div class="button-row">
+    <button onclick="toggleHistory()">🕓 Order History</button>
+    <button onclick="toggleAddForm()"><span style="color: #d32f2f;">➕</span> Add New Order</button>
+    <button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+  </div>
+
+  <div id="orderContainer"></div>
+  <div id="historyContainer" style="display: none;"></div>
+  <div id="addFormContainer" style="display: none; margin-top: 20px;"></div>
+
+  <script>
+    let orders = {
+      "ORD001": {
+        product: "Vampire Halloween Costume",
+        quantity: 1,
+        date: "2025-04-01 3:30 PM",
+        status: "Processing",
+        image: "https://i.imgur.com/yhHtDkA.png"
+      },
+      "ORD002": {
+        product: "Traditional Hanbok Dress",
+        quantity: 1,
+        date: "2025-04-03 10:15 AM",
+        status: "Shipped",
+        image: "https://i.imgur.com/yhHtDkA.png"
+      },
+      "ORD003": {
+        product: "Superhero Kids Costume Set",
+        quantity: 2,
+        date: "2025-04-05 5:00 PM",
+        status: "Delivered",
+        image: "https://i.imgur.com/yhHtDkA.png"
+      }
+    };
+
+    function trackOrder() {
+      const input = document.getElementById("orderIdInput").value.trim().toUpperCase();
+      const order = orders[input];
+      const container = document.getElementById("orderContainer");
+      container.innerHTML = "";
+
+      if (!order) {
+        container.innerHTML = "<p style='color: red; text-align:center;'>Order not found! Please check your Order ID.</p>";
+        return;
+      }
+
+      const statusClass = order.status.toLowerCase().replace(" ", "");
+
+      container.innerHTML = `
+        <div class="order-details">
+          <h3>Order Found</h3>
+          <p><strong>Order ID:</strong> ${input}</p>
+          <p><strong>Costume:</strong> ${order.product}</p>
+          <p><strong>Quantity:</strong> ${order.quantity}</p>
+          <p><strong>Order Date:</strong> ${order.date}</p>
+          <p><strong>Status:</strong> ${order.status}</p>
+          <div class="progress-bar">
+            <div class="progress ${statusClass}">${order.status}</div>
+          </div>
+          <img src="${order.image}" alt="${order.product}">
+        </div>
+      `;
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    function toggleHistory() {
+      const history = document.getElementById("historyContainer");
+      if (history.style.display === "none") {
+        history.style.display = "block";
+        renderHistory();
+      } else {
+        history.style.display = "none";
+      }
+    }
+
+    function renderHistory() {
+      const container = document.getElementById("historyContainer");
+      container.innerHTML = "<h3>📜 Order History</h3>";
+
+      for (const id in orders) {
+        const order = orders[id];
+        const statusClass = order.status.toLowerCase().replace(" ", "");
+        container.innerHTML += `
+          <div class="order-details" id="order-${id}">
+            <p><strong>Order ID:</strong> ${id}</p>
+            <p><strong>Costume:</strong> ${order.product}</p>
+            <p><strong>Quantity:</strong> ${order.quantity}</p>
+            <p><strong>Date:</strong> ${order.date}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+            <div class="progress-bar">
+              <div class="progress ${statusClass}">${order.status}</div>
+            </div>
+            <img src="${order.image}" alt="${order.product}">
+            <br><br>
+            <button onclick="editOrder('${id}')">✏️ Edit</button>
+          </div>
+        `;
+      }
+    }
+
+    function editOrder(id) {
+      const order = orders[id];
+      const container = document.getElementById(`order-${id}`);
+      container.innerHTML = `
+        <div class="order-details" style="text-align:left;">
+          <h3>Edit Order: ${id}</h3>
+          <label>Product Name: <input type="text" id="editProduct-${id}" value="${order.product}"></label><br><br>
+          <label>Quantity: <input type="number" id="editQty-${id}" value="${order.quantity}"></label><br><br>
+          <label>Date: <input type="text" id="editDate-${id}" value="${order.date}"></label><br><br>
+          <label>Status:
+            <select id="editStatus-${id}">
+              <option ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+              <option ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+              <option ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+            </select>
+          </label><br><br>
+          <label>Image URL: <input type="text" id="editImage-${id}" value="${order.image}"></label><br><br>
+          <button onclick="saveEdit('${id}')">💾 Save</button>
+        </div>
+      `;
+    }
+
+    function saveEdit(id) {
+      const product = document.getElementById(`editProduct-${id}`).value.trim();
+      const quantity = parseInt(document.getElementById(`editQty-${id}`).value);
+      const date = document.getElementById(`editDate-${id}`).value.trim();
+      const status = document.getElementById(`editStatus-${id}`).value;
+      const image = document.getElementById(`editImage-${id}`).value.trim();
+
+      if (!product || isNaN(quantity) || !date || !status || !image) {
+        alert("Please fill all fields correctly.");
+        return;
+      }
+
+      orders[id] = {
+        product,
+        quantity,
+        date,
+        status,
+        image
+      };
+
+      alert("Order updated successfully!");
+      renderHistory();
+    }
+
+    function toggleAddForm() {
+      const form = document.getElementById("addFormContainer");
+      if (form.style.display === "none") {
+        form.style.display = "block";
+        form.innerHTML = `
+          <h3>Add New Order</h3>
+          <div class="order-details" style="text-align:left;">
+            <label>Order ID: <input type="text" id="newId"></label><br><br>
+            <label>Product Name: <input type="text" id="newProduct"></label><br><br>
+            <label>Quantity: <input type="number" id="newQty"></label><br><br>
+            <label>Date: <input type="text" id="newDate" placeholder="2025-04-10 12:00 PM"></label><br><br>
+            <label>Status:
+              <select id="newStatus">
+                <option>Processing</option>
+                <option>Shipped</option>
+                <option>Delivered</option>
+              </select>
+            </label><br><br>
+            <label>Image URL: <input type="text" id="newImage"></label><br><br>
+            <button onclick="addNewOrder()">Add Order</button>
+          </div>
+        `;
+      } else {
+        form.style.display = "none";
+      }
+    }
+
+    function addNewOrder() {
+      const id = document.getElementById("newId").value.trim().toUpperCase();
+      const product = document.getElementById("newProduct").value.trim();
+      const qty = parseInt(document.getElementById("newQty").value);
+      const date = document.getElementById("newDate").value.trim();
+      const status = document.getElementById("newStatus").value;
+      const image = document.getElementById("newImage").value.trim();
+
+      if (!id || !product || isNaN(qty) || !date || !status || !image) {
+        alert("Please fill in all fields correctly.");
+        return;
+      }
+
+      orders[id] = {
+        product,
+        quantity: qty,
+        date,
+        status,
+        image
+      };
+
+      alert("Order added successfully!");
+      document.getElementById("addFormContainer").style.display = "none";
+      renderHistory();
+    }
+  </script>
+
+</body>
+</html>
