@@ -1,7 +1,6 @@
 
 ----Order history and tracking---
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -142,21 +141,21 @@
         quantity: 1,
         date: "2025-04-01 3:30 PM",
         status: "Processing",
-        image: "https://i.imgur.com/yhHtDkA.png"
+        image: "assets/Vampire Halloween Costume.jpg"
       },
       "ORD002": {
         product: "Traditional Hanbok Dress",
         quantity: 1,
         date: "2025-04-03 10:15 AM",
         status: "Shipped",
-        image: "https://i.imgur.com/yhHtDkA.png"
+        image: "assets/Traditional Hanbok Dress .jpg"
       },
       "ORD003": {
         product: "Superhero Kids Costume Set",
         quantity: 2,
         date: "2025-04-05 5:00 PM",
         status: "Delivered",
-        image: "https://i.imgur.com/yhHtDkA.png"
+        image: "assets/Superhero Kids Costume Set.jpg"
       }
     };
 
@@ -220,11 +219,20 @@
             <div class="progress-bar">
               <div class="progress ${statusClass}">${order.status}</div>
             </div>
-            <img src="${order.image}" alt="${order.product}">
+            <img src="${order.image}" alt="${order.product}" onerror="this.src='assets/default.jpg';">
             <br><br>
             <button onclick="editOrder('${id}')">✏️ Edit</button>
+            <button onclick="deleteOrder('${id}')">🗑️ Delete</button>
           </div>
         `;
+      }
+    }
+
+    function deleteOrder(id) {
+      if (confirm(`Are you sure you want to delete Order ID ${id}?`)) {
+        delete orders[id];
+        alert("Order deleted.");
+        renderHistory();
       }
     }
 
@@ -262,14 +270,7 @@
         return;
       }
 
-      orders[id] = {
-        product,
-        quantity,
-        date,
-        status,
-        image
-      };
-
+      orders[id] = { product, quantity, date, status, image };
       alert("Order updated successfully!");
       renderHistory();
     }
@@ -314,14 +315,7 @@
         return;
       }
 
-      orders[id] = {
-        product,
-        quantity: qty,
-        date,
-        status,
-        image
-      };
-
+      orders[id] = { product, quantity: qty, date, status, image };
       alert("Order added successfully!");
       document.getElementById("addFormContainer").style.display = "none";
       renderHistory();
